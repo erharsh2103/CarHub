@@ -339,7 +339,10 @@ class UsbMdnsAdvertiser(
 
     companion object {
         private const val TAG = "UsbMdnsAdvertiser"
-        private val USB_IFACE = Regex("(usb|rndis|ncm)\\d+")
+        // USB tether (usb/rndis/ncm) AND Wi-Fi hotspot interfaces (ap0, swlan0, softap0, wlan1+).
+        // Android's own NsdManager advertises on neither, so the iPhone on a stereo's hotspot
+        // cannot discover the receiver without this. wlan0 (the station link) is left to NsdManager.
+        private val USB_IFACE = Regex("(usb|rndis|ncm|ap|swlan|softap)\\d+|wlan[1-9][0-9]*")
         private const val MDNS_PORT = 5353
         private val GROUP = InetSocketAddress(InetAddress.getByName("224.0.0.251"), MDNS_PORT)
         private const val SCAN_MS = 2000L

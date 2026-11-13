@@ -456,7 +456,13 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
                 log(if (iface == null) "USB link down" else "USB link up on $iface (${addr?.hostAddress})")
             }.apply { start() }
         } else {
+            // System mDNS covers a normal Wi-Fi (both devices on a router). It does NOT advertise
+            // on a hotspot (or USB) interface, so also run the custom advertiser there: on a stereo
+            // hosting its own hotspot, this is what lets the iPhone discover the receiver.
             nsdManager?.register(services)
+            usbAdvertiser = UsbMdnsAdvertiser(services) { iface, addr ->
+                log(if (iface == null) "Local link down" else "Local link (hotspot/USB) up on $iface (${addr?.hostAddress})")
+            }.apply { start() }
         }
 
         _serverState.value = ServerState.RUNNING
