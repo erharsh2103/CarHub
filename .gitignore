@@ -1,0 +1,15 @@
+# build output
+build/
+*/build/
+.gradle/
+out/
+*.log
+# local + secrets (never publish)
+local.properties
+key.properties
+*.jks
+*.keystore
+headunit-release-key.jks
+# IDE
+.idea/
+*.iml
