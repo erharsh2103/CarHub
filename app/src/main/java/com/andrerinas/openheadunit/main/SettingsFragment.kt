@@ -254,6 +254,9 @@ class SettingsFragment : Fragment() {
     private var pendingFiveGhzChannel by pending::fiveGhzChannel
     private var pendingHotspotSsid by pending::hotspotSsid
     private var pendingHotspotPassword by pending::hotspotPassword
+    private var pendingPhoneHotspotSsid by pending::phoneHotspotSsid
+    private var pendingIphoneTarget by pending::iphoneHandoffPackage
+    private var pendingPhoneHotspotPassword by pending::phoneHotspotPassword
     private var pendingHotspotInterface by pending::hotspotInterface
 
     private var pendingEnableCarLauncher by pending::enableCarLauncher
@@ -742,6 +745,9 @@ class SettingsFragment : Fragment() {
         pendingFiveGhzChannel?.let { if (it != settings.fiveGhzChannel) settings.fiveGhzChannel = it }
         pendingHotspotSsid?.let { if (it != settings.hotspotSsid) settings.hotspotSsid = it }
         pendingHotspotPassword?.let { if (it != settings.hotspotPassword) settings.hotspotPassword = it }
+        pendingPhoneHotspotSsid?.let { if (it != settings.phoneHotspotSsid) settings.phoneHotspotSsid = it }
+        pendingIphoneTarget?.let { if (it != settings.iphoneHandoffPackage) settings.iphoneHandoffPackage = it }
+        pendingPhoneHotspotPassword?.let { if (it != settings.phoneHotspotPassword) settings.phoneHotspotPassword = it }
         pendingHotspotInterface?.let { if (it != settings.hotspotInterface) settings.hotspotInterface = it }
         pendingInsetLeft?.let { if (it != settings.insetLeft) settings.insetLeft = it }
         pendingInsetTop?.let { if (it != settings.insetTop) settings.insetTop = it }
@@ -1290,8 +1296,52 @@ class SettingsFragment : Fragment() {
                 }
             ))
 
-            // Mode 1 (Auto Server) can also use the auto-hotspot feature
-            if (pendingWifiConnectionMode == WifiLauncherMode.AUTO) {
+            // Phone hotspot client mode (like Headunit Reloaded's "WiFi client mode"): the phone
+            // makes the hotspot, this unit joins it, then dials the phone's head unit server.
+            val phoneSsid = pendingPhoneHotspotSsid ?: settings.phoneHotspotSsid
+            items.add(SettingItem.SettingEntry(
+                stableId = "phoneHotspotSsid",
+                nameResId = R.string.phone_hotspot_ssid,
+                helpResId = R.string.phone_hotspot_ssid_help,
+                value = phoneSsid.ifEmpty { getString(R.string.phone_hotspot_off) },
+                onClick = { _ ->
+                    DialogUtils.showTextInputDialogWithMessage(
+                        requireContext(),
+                        R.string.phone_hotspot_ssid,
+                        R.string.phone_hotspot_ssid_help,
+                        phoneSsid
+                    ) { newVal ->
+                        pendingPhoneHotspotSsid = newVal.trim()
+                        checkChanges()
+                        updateSettingsList()
+                    }
+                }
+            ))
+            if (phoneSsid.isNotBlank()) {
+                val phonePass = pendingPhoneHotspotPassword ?: settings.phoneHotspotPassword
+                items.add(SettingItem.SettingEntry(
+                    stableId = "phoneHotspotPassword",
+                    nameResId = R.string.phone_hotspot_password,
+                    helpResId = R.string.phone_hotspot_password_help,
+                    value = if (phonePass.isEmpty()) getString(R.string.phone_hotspot_open) else "•".repeat(phonePass.length),
+                    onClick = { _ ->
+                        DialogUtils.showTextInputDialogWithMessage(
+                            requireContext(),
+                            R.string.phone_hotspot_password,
+                            R.string.phone_hotspot_password_help,
+                            phonePass
+                        ) { newVal ->
+                            pendingPhoneHotspotPassword = newVal
+                            checkChanges()
+                            updateSettingsList()
+                        }
+                    }
+                ))
+            }
+
+            // Mode 1 (Auto Server) can also use the auto-hotspot feature, but not while it is
+            // meant to join the phone's hotspot instead.
+            if (pendingWifiConnectionMode == WifiLauncherMode.AUTO && phoneSsid.isBlank()) {
                 addHotspotToggle(items)
             }
         }
@@ -1883,6 +1933,26 @@ class SettingsFragment : Fragment() {
             isChecked = pendingLowEndMode ?: settings.lowEndMode,
             onCheckedChanged = { isChecked ->
                 pendingLowEndMode = isChecked
+                checkChanges()
+                updateSettingsList()
+            }
+        ))
+
+        // What the "CarHub iPhone" icon (and auto-open) hands the iPhone to.
+        val iphoneTargets = listOf(
+            com.andrerinas.openheadunit.utils.PhoneHub.HEADUNIT_RELOADED_PACKAGE,
+            com.andrerinas.openheadunit.utils.PhoneHub.AIRPLAY,
+            com.andrerinas.openheadunit.utils.PhoneHub.DEFAULT_CARPLAY_PACKAGE
+        )
+        val currentTarget = pendingIphoneTarget ?: settings.iphoneHandoffPackage
+        items.add(SettingItem.SegmentedButtonSettingEntry(
+            stableId = "iphoneTarget",
+            nameResId = R.string.iphone_target,
+            helpResId = R.string.iphone_target_help,
+            options = listOf(getString(R.string.iphone_target_hur), getString(R.string.iphone_target_airplay), getString(R.string.iphone_target_diplay)),
+            selectedIndex = iphoneTargets.indexOf(currentTarget).coerceAtLeast(0),
+            onOptionSelected = { index ->
+                pendingIphoneTarget = iphoneTargets[index]
                 checkChanges()
                 updateSettingsList()
             }

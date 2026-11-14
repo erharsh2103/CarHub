@@ -25,15 +25,23 @@ Needs Android 5.0 or newer.
   picture, so Spotify stops stuttering. First run also picks **720p / 30 fps / AAC**, the stable
   profile for a 2.4 GHz screen — 60 fps is what makes a 2.4 GHz link drop into a connect/disconnect
   loop. Change these any time in Settings → Video.
-- **AirPlay for iPhone** — the iPhone's music and mirrored screen over the stereo's Wi-Fi hotspot.
-  No cable, no dongle, no Bluetooth data channel. Open it with the **CarHub iPhone** icon
-  (manual by default).
+- **iPhone: CarPlay or AirPlay, one tap.** The **CarHub iPhone** icon opens what you pick in
+  Settings → *iPhone opens*: **CarPlay via [Headunit Reloaded](https://play.google.com/store/apps/details?id=gb.xxy.hr)**
+  (installed separately; default when present), CarHub's built-in **AirPlay** (music + screen
+  mirroring over Wi-Fi), or **DiPlay**. Manual by default; auto-open is an optional switch.
+- **Phone hotspot mode (most stable wireless AA).** In Headunit Server mode, enter your *phone's*
+  hotspot name + password: tapping WiFi joins the stereo to the phone's hotspot and connects to
+  Android Auto's Head-unit server. The phone keeps its mobile data, so the link does not drop, and
+  no Bluetooth is needed.
 
-## Why not wireless CarPlay?
+## Wireless Android Auto: which setup?
 
-CarPlay must start with a Bluetooth handshake to the iPhone, and many cheap stereos route Bluetooth
-through the maker's own chip that apps cannot use — so wireless CarPlay cannot work there, by any
-app. AirPlay runs over Wi-Fi instead and does the same job (music + screen).
+1. **Phone hotspot (recommended for stereos without internet or usable Bluetooth):**
+   phone hotspot on (2.4 GHz if the screen is 2.4 GHz only) → Android Auto developer settings →
+   *Start head unit server* → in CarHub, Wireless Mode = Headunit Server, fill *Phone hotspot
+   name/password* → tap WiFi.
+2. **Native** (stereo makes the hotspot, Bluetooth handshake) — only on stereos whose Bluetooth apps
+   can use.
 
 ## Build from source
 

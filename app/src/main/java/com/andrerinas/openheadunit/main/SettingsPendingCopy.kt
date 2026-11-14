@@ -81,6 +81,9 @@ class SettingsPendingCopy {
     var fiveGhzChannel: Int? = null
     var hotspotSsid: String? = null
     var hotspotPassword: String? = null
+    var phoneHotspotSsid: String? = null
+    var iphoneHandoffPackage: String? = null
+    var phoneHotspotPassword: String? = null
     var hotspotInterface: String? = null
     var enableCarLauncher: Boolean? = null
     var enableFloatingButton: Boolean? = null
@@ -175,6 +178,9 @@ class SettingsPendingCopy {
         fiveGhzChannel = settings.fiveGhzChannel
         hotspotSsid = settings.hotspotSsid
         hotspotPassword = settings.hotspotPassword
+        phoneHotspotSsid = settings.phoneHotspotSsid
+        iphoneHandoffPackage = settings.iphoneHandoffPackage
+        phoneHotspotPassword = settings.phoneHotspotPassword
         hotspotInterface = settings.hotspotInterface
         enableCarLauncher = settings.enableCarLauncher
         enableFloatingButton = settings.enableFloatingButton
@@ -270,6 +276,9 @@ class SettingsPendingCopy {
         fiveGhzChannel != settings.fiveGhzChannel ||
         hotspotSsid != settings.hotspotSsid ||
         hotspotPassword != settings.hotspotPassword ||
+        phoneHotspotSsid != settings.phoneHotspotSsid ||
+        iphoneHandoffPackage != settings.iphoneHandoffPackage ||
+        phoneHotspotPassword != settings.phoneHotspotPassword ||
         hotspotInterface != settings.hotspotInterface ||
         enableCarLauncher != settings.enableCarLauncher ||
         enableFloatingButton != settings.enableFloatingButton ||

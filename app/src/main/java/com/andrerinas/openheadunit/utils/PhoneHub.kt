@@ -25,6 +25,11 @@ import androidx.core.content.ContextCompat
 object PhoneHub {
 
     const val DEFAULT_CARPLAY_PACKAGE = "com.shihab.diplay"
+    /** Headunit Reloaded: its CarPlay works on units where DiPlay's Bluetooth route does not. */
+    const val HEADUNIT_RELOADED_PACKAGE = "gb.xxy.hr"
+
+    fun isInstalled(context: Context, pkg: String): Boolean =
+        context.packageManager.getLaunchIntentForPackage(pkg) != null
     /** Built-in AirPlay, the default: not a package, handled in-process. */
     const val AIRPLAY = "airplay"
     private const val APPLE_USB_VENDOR_ID = 0x05AC

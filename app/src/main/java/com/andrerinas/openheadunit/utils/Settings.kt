@@ -1451,7 +1451,10 @@ class Settings(private val context: Context) {
         set(value) { prefs.edit().putBoolean("iphone-handoff-enabled", value).apply() }
 
     var iphoneHandoffPackage: String
-        get() = prefs.getString("iphone-handoff-package", PhoneHub.AIRPLAY)!!
+        // Default: Headunit Reloaded's CarPlay when it is installed, otherwise built-in AirPlay.
+        get() = prefs.getString("iphone-handoff-package", null)
+            ?: if (PhoneHub.isInstalled(context, PhoneHub.HEADUNIT_RELOADED_PACKAGE)) PhoneHub.HEADUNIT_RELOADED_PACKAGE
+            else PhoneHub.AIRPLAY
         set(value) { prefs.edit().putString("iphone-handoff-package", value).apply() }
 
     // Experimental backend: keep AudioTrack unless the user explicitly opts in.
@@ -2609,7 +2612,8 @@ class Settings(private val context: Context) {
         set(value) { prefs.edit().putBoolean("kill-on-disconnect", value).apply() }
 
     var autoEnableHotspot: Boolean
-        get() = prefs.getBoolean("auto-enable-hotspot", false)
+        // Never bring this unit's own hotspot up while it is meant to be a client of the phone's.
+        get() = prefs.getBoolean("auto-enable-hotspot", false) && !joinsPhoneHotspot
         set(value) { prefs.edit().putBoolean("auto-enable-hotspot", value).apply() }
 
     var waitForWifiBeforeWifiDirect: Boolean
@@ -2791,6 +2795,25 @@ class Settings(private val context: Context) {
     var hotspotPassword: String
         get() = prefs.getString("hotspot-password", "")!!
         set(value) = prefs.edit().putString("hotspot-password", value).apply()
+
+    /**
+     * Phone hotspot client mode (Headunit Server): the PHONE makes the hotspot and this unit joins
+     * it, then dials Android Auto's head unit server at the phone (the Wi-Fi gateway) on port 5277.
+     * No Bluetooth, and the phone keeps its mobile data, so it never drops a "no internet" link.
+     * Blank = off; join the network yourself in the unit's Wi-Fi settings.
+     */
+    var phoneHotspotSsid: String
+        get() = prefs.getString("phone-hotspot-ssid", "")!!
+        set(value) = prefs.edit().putString("phone-hotspot-ssid", value).apply()
+
+    var phoneHotspotPassword: String
+        get() = prefs.getString("phone-hotspot-password", "")!!
+        set(value) = prefs.edit().putString("phone-hotspot-password", value).apply()
+
+    /** True when Headunit Server mode should join the phone's hotspot instead of hosting one. */
+    val joinsPhoneHotspot: Boolean
+        get() = phoneHotspotSsid.isNotBlank() &&
+            (wifiConnectionMode == WifiLauncherMode.AUTO || wifiConnectionMode == WifiLauncherMode.MANUAL)
 
     // Which band to ask for when this app brings the head unit's access point up.
     // 0 = automatic (5 GHz, falling back to 2.4 GHz), 1 = 5 GHz only, 2 = 2.4 GHz only.
