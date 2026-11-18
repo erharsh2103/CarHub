@@ -57,8 +57,10 @@
         android:name="android.hardware.bluetooth"
         android:required="false" />
 
+    <!-- Named after this app's id: declaring Open Headunit's own permission name made Android
+         refuse to install CarHub ("App not installed") next to Open Headunit. -->
     <permission
-        android:name="com.andrerinas.openheadunit.permission.NAVIGATION_UPDATE"
+        android:name="${applicationId}.permission.NAVIGATION_UPDATE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="android.permission.TURN_SCREEN_ON" />
